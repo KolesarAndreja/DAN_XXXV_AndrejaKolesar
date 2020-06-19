@@ -11,18 +11,34 @@ namespace DAN_XXXV_AndrejaKolesar
     {
         static int numOfParticipant;
         static int number;
+        static Thread t1 = new Thread(UserInput);
+        static Task<Thread[]> t2 = new Task<Thread[]>(ThreadGenerator);
 
         public static void UserInput()
         {
             Console.WriteLine("Unesite broj učesnika: ");
             numOfParticipant = ValidNumber(int.MaxValue);
-
-            Console.WriteLine("Unesite broj koji će ostali učesnici pogađati: ");
+            Console.WriteLine("Unesite broj između 1 i 100 koji će ostali učesnici pogađati: ");
             number = ValidNumber(100);
-
+            t2.Start();
+            Console.WriteLine("Broj učesnika: {0} \nOdabrani broj: {1}", numOfParticipant, number);
         }
 
-        public static void ThreadGenerator()
+        public static Thread[] ThreadGenerator()
+        {
+            Thread[] participants = new Thread[numOfParticipant];
+            for(int i = 0; i < numOfParticipant; i++)
+            {
+                participants[i] = new Thread(GuessNumber)
+                {
+                    Name = string.Format("Učesnik_{0}", i + 1)
+                };
+            }
+
+            return participants;
+        }
+
+        public static void GuessNumber()
         {
 
         }
@@ -46,12 +62,9 @@ namespace DAN_XXXV_AndrejaKolesar
 
         public static void NumberGuessingSimulator()
         {
-            Thread t1 = new Thread(UserInput);
-            Thread t2 = new Thread(ThreadGenerator)
-            {
-                Name = "Thread_Generator"
-            };
-
+            t1.Start();
+            t1.Join();
+            t2.Wait();
         }
 
         static void Main(string[] args)
