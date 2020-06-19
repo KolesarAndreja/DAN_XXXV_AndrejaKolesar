@@ -11,12 +11,11 @@ namespace DAN_XXXV_AndrejaKolesar
     {
         //locker
         static object obj = new object();
-        static object obj2 = new object();
         static int numOfParticipant;
         static int number;
-        static Thread t1 = new Thread(UserInput);
         static Task<Thread[]> t2 = new Task<Thread[]>(ThreadGenerator);
         static bool IsGuessed = false;
+        public static Random random = new Random();
 
         public static void UserInput()
         {
@@ -44,14 +43,13 @@ namespace DAN_XXXV_AndrejaKolesar
 
         public static void GuessNumber()
         {
-            Random random = new Random();
+            
             int n=0;
             do
             {
-                int userNumber = random.Next(0, 101);
                 lock (obj)
                 {
-
+                    int userNumber = random.Next(0, 101);
                     if (!IsGuessed)
                     {
                         if (userNumber == number)
@@ -70,8 +68,8 @@ namespace DAN_XXXV_AndrejaKolesar
                         }
                     }
                 }
+                Thread.Sleep(100);
             } while (n != number && !IsGuessed);
-
         }
 
         /// <summary>
@@ -91,43 +89,23 @@ namespace DAN_XXXV_AndrejaKolesar
             return Num;
         }
 
-        public static void NumberGuessingSimulator()
+        static void Main(string[] args)
         {
+            Thread t1 = new Thread(UserInput);
             t1.Start();
             t1.Join();
             t2.Wait();
             Thread[] generatedThreads = t2.Result;
-            foreach(var t in generatedThreads)
+            foreach (var t in generatedThreads)
             {
                 t.Start();
             }
 
-            foreach(var t in generatedThreads)
+            foreach (var t in generatedThreads)
             {
                 t.Join();
             }
-        }
-
-        static void Main(string[] args)
-        {
-            string s = "";
-            Console.Write("1.Simulator pogađanja broja \n2.Izlaz iz aplikacije \nVaš izbor: ");
-            do
-            {
-                s = Console.ReadLine();
-                switch (s)
-                {
-                    case "1":
-                        NumberGuessingSimulator();
-                        Console.Write("1.Simulator pogađanja broja \n2.Izlaz iz aplikacije \nVaš izbor: "); ;
-                        break;
-                    case "2":
-                        break;
-                    default:
-                        Console.Write("Pogrešan unos. Ponovite: ");
-                        break;
-                }
-            } while (s != "2");
+            Console.ReadKey();
         }
     }
 }
